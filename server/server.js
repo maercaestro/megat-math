@@ -8,8 +8,7 @@ import { writeFile, readdir, stat, unlink } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import katex from 'katex';
-import mjAPI from 'mathjax-node';
+
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
