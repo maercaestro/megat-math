@@ -85,7 +85,7 @@ function App() {
     try {
       console.log('Sending image data length:', imageData?.length);
 
-      const response = await fetch('${baseURL}/vision', {
+      const response = await fetch(`${baseURL}/vision`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ function App() {
     setLoading(true);
     try {
       const fullDataUrl = canvasRef.current.getDataURL('png');
-      const response = await fetch('${baseURL}/calculate', {
+      const response = await fetch(`${baseURL}/calculate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ function App() {
   const handleLatexConversion = async () => {
     setLoading(true);
     try {
-      const response = await fetch('${baseURL}/latex', {
+      const response = await fetch(`${baseURL}/latex`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ function App() {
   const handleGetSolution = async () => {
     setLoading(true);
     try {
-      const response = await fetch('${baseURL}/solve-steps', {
+      const response = await fetch(`${baseURL}/solve-steps`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
