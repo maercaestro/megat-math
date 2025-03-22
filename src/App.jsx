@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import './App.css';
 import logo from './assets/logo2.png';
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 function App() {
   const canvasRef = useRef(null);
