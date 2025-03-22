@@ -26,6 +26,11 @@ app.use(bodyParser.json({ limit: '50mb' }));
 // Add static file serving for temp directory
 app.use('/temp', express.static(path.join(__dirname, 'temp')));
 
+// Simple test route
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from EC2 backend!' });
+});
+
 // Initialize APIs
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
