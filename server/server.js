@@ -35,16 +35,6 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-// Initialize MathJax
-mjAPI.config({
-  MathJax: {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']]
-    }
-  }
-});
-mjAPI.start();
-
 // Function to save temporary image
 async function saveTemporaryImage(base64Data) {
   const filename = `math-${Date.now()}.png`;
@@ -182,22 +172,6 @@ app.post('/calculate', async (req, res) => {
     });
   }
 });
-
-// Add converter utility function
-async function convertMathToHTML(mathText) {
-  try {
-    const result = await mjAPI.typeset({
-      math: mathText,
-      format: "TeX",
-      html: true,
-      css: true
-    });
-    return result.html;
-  } catch (error) {
-    console.error('Math conversion error:', error);
-    return mathText; // Fallback to plain text
-  }
-}
 
 // Update the solve-steps endpoint to use OpenAI GPT-4
 app.post('/solve-steps', async (req, res) => {
