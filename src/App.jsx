@@ -83,41 +83,67 @@ function App() {
 
   const processVision = async (imageData) => {
     try {
-      console.log('Sending image data length:', imageData?.length);
-
+      // Debug logs
+      console.log('Sending request to:', `$/vision`);
+      
       const response = await fetch(`${baseURL}/vision`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({ 
           imageBase64: imageData.split(',')[1]
         }),
       });
 
+      // Check response status first
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Server error: ${errorData.details || response.statusText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('Vision API Response:', data);
+      // Get content type
+      const contentType = response.headers.get("content-type");
+      console.log('Response content type:', contentType);
 
+      // Get raw response text
+      const rawResponse = await response.text();
+      console.log('Raw server response:', rawResponse);
+
+      // Validate response format
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Server returned non-JSON response:', rawResponse);
+        throw new Error('Server returned invalid content type');
+      }
+
+      // Try to parse JSON
+      let data;
+      try {
+        data = JSON.parse(rawResponse);
+      } catch (e) {
+        console.error('Failed to parse response as JSON:', rawResponse);
+        throw new Error('Invalid JSON response from server');
+      }
+
+      // Process the data
       if (data.text) {
         setVisionText(data.text);
         setEditableText(data.text);
+      } else {
+        throw new Error('Response missing text field');
       }
+
     } catch (error) {
       console.error('Vision API Error:', error);
-      // Optionally show user-friendly error
-      // alert('Failed to process image. Please try again.');
+      alert(`Error: ${error.message}. Please check console for details.`);
     }
   };
 
   const handleSubmitEquation = async () => {
     setLoading(true);
     try {
-      const fullDataUrl = canvasRef.current.getDataURL('png');
+      // Use exportImage instead of getDataURL for ReactSketchCanvas
+      const fullDataUrl = await canvasRef.current.exportImage('png');
       const response = await fetch(`${baseURL}/calculate`, {
         method: 'POST',
         headers: {

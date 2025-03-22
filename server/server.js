@@ -23,8 +23,6 @@ const port = process.env.PORT || 5001;
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-// Add static file serving for temp directory
-app.use('/temp', express.static(path.join(__dirname, 'temp')));
 
 // Simple test route
 app.get('/api/hello', (req, res) => {
@@ -79,10 +77,17 @@ app.get('/test', (req, res) => {
 
 // Update the vision endpoint to use Groq SDK
 app.post('/vision', async (req, res) => {
-  console.log('Vision endpoint hit');
-  let { imageBase64 } = req.body;
-  
   try {
+    console.log('Received vision request');
+    let { imageBase64 } = req.body;
+    
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'No image data provided' });
+    }
+
+    // Debug the incoming data
+    console.log('Image data length:', imageBase64.length);
+    
     const chatCompletion = await groq.chat.completions.create({
       messages: [{
         role: "user",
@@ -107,31 +112,30 @@ app.post('/vision', async (req, res) => {
       stop: null
     });
 
-    console.log('Groq Response:', chatCompletion);
+    console.log('Groq Response:', JSON.stringify(chatCompletion, null, 2));
 
-    if (chatCompletion.choices && chatCompletion.choices[0]) {
-      let text = chatCompletion.choices[0].message.content.trim();
-      
-      // Limit output to 30 characters
-      if (text.length > 10) {
-        text = text.substring(0, 10);
-        console.log('Text truncated to:', text);
-      }
-      
-      res.json({ text });
-    } else {
-      throw new Error('Invalid response format from Groq');
+    if (!chatCompletion?.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response structure from Groq');
     }
 
-  } catch (error) {
-    console.error('Groq API Error:', {
-      message: error.message,
-      details: error.response?.data || error
+    let text = chatCompletion.choices[0].message.content.trim();
+    text = text.substring(0, 10); // Limit to 10 characters
+
+    // Set proper headers and return JSON
+    res.setHeader('Content-Type', 'application/json');
+    return res.json({
+      success: true,
+      text: text
     });
+
+  } catch (error) {
+    console.error('Vision endpoint error:', error);
     
-    res.status(500).json({ 
-      error: 'Failed to process vision request',
-      details: error.message
+    // Ensure we always return JSON
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
     });
   }
 });
