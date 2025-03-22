@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import CanvasDraw from 'react-canvas-draw';
+import { ReactSketchCanvas } from 'react-sketch-canvas';
 import './App.css';
-import 'katex/dist/katex.min.css';
-import logo from './assets/logo2.png'; // Adjust path according to your logo location
+import logo from './assets/logo2.png';
 
 function App() {
   const canvasRef = useRef(null);
@@ -37,7 +36,7 @@ function App() {
   }, []);
 
   const handleClear = () => {
-    canvasRef.current.clear();
+    canvasRef.current?.clearCanvas();
     setAnswer('');
     setOverlayImage(null);
     setVisionText('');
@@ -69,34 +68,16 @@ function App() {
   };
 
   const handleCalculate = async () => {
-    setLoading(true);
-    try {
-      const fullDataUrl = canvasRef.current.getDataURL('png');
-      const response = await fetch('/calculate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          imageBase64: fullDataUrl.split(',')[1],
-          ocrText: editableText
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    if (canvasRef.current) {
+      setLoading(true);
+      try {
+        const imageData = await canvasRef.current.exportImage('png');
+        await processVision(imageData);
+      } catch (error) {
+        console.error('Failed to process canvas:', error);
       }
-
-      const data = await response.json();
-      if (data.description) {
-        setAnswer(data.description);
-        addTextToCanvas(fullDataUrl, data.description);
-      }
-    } catch (error) {
-      console.error('API error:', error);
-      alert('An error occurred while processing. Please try again.');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const processVision = async (imageData) => {
@@ -164,13 +145,13 @@ function App() {
   };
 
   const handleCanvasChange = () => {
-    console.log('Canvas changed'); // Debug log
     clearTimeout(window.visionTimeout);
-    window.visionTimeout = setTimeout(() => {
-      console.log('Processing vision after timeout'); // Debug log
-      const imageData = canvasRef.current.getDataURL('png');
-      processVision(imageData);
-    }, 1000); // Increased delay for LLM processing
+    window.visionTimeout = setTimeout(async () => {
+      if (canvasRef.current) {
+        const imageData = await canvasRef.current.exportImage('png');
+        processVision(imageData);
+      }
+    }, 1000);
   };
 
   const handleLatexConversion = async () => {
@@ -411,17 +392,16 @@ function App() {
             {/* Canvas Drawing Area */}
             <div className="w-full h-full mx-auto bg-white bg-opacity-95 rounded-xl shadow-2xl p-4 mb-8 overflow-hidden">
               <div className="w-full h-full" style={{ aspectRatio: '16/9' }}>
-                <CanvasDraw
+                <ReactSketchCanvas
                   ref={canvasRef}
-                  canvasWidth={canvasSize.width}
-                  canvasHeight={canvasSize.height}
-                  brushColor={brushColor}
-                  brushRadius={brushRadius}
-                  lazyRadius={1}
+                  strokeWidth={brushRadius}
+                  strokeColor={brushColor}
+                  canvasColor="white"
                   className="w-full h-full"
-                  hideGrid={true}
                   onChange={handleCanvasChange}
-                  immediateLoading={true}
+                  exportWithBackgroundImage={true}
+                  withTimestamp={false}
+                  allowOnlyPointerType="all"
                 />
               </div>
             </div>
