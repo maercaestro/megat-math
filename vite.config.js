@@ -8,17 +8,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/vision': {
-        target: 'http://localhost:5001',
+        target: 'http://50.19.151.86:5001',
         changeOrigin: true,
         secure: false,
       },
       '/calculate': {
-        target: 'http://localhost:5001',
+        target: 'http://50.19.151.86:5001',
         changeOrigin: true,
         secure: false,
       },
       '/solve-steps': {
-        target: 'http://localhost:5001',
+        target: 'http://50.19.151.86:5001',
         changeOrigin: true,
         secure: false,
       },
