@@ -11,7 +11,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.14",
+    "@types/katex": "^0.16.7",
+    "better-react-mathjax": "^2.1.0",
     "cors": "^2.8.5",
+    "groq-sdk": "^0.17.0",
+    "katex": "^0.16.21",
+    "mathjax-node": "^2.1.1",
     "react": "^19.0.0",
     "react-canvas-draw": "^1.2.1",
     "react-dom": "^19.0.0",
