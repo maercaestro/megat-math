@@ -4,7 +4,7 @@ MEGAT Math is an AI-powered math assistant that lets users draw or upload handwr
 
 Built with **Vite** using **React**, **Node.js**, **Tailwind CSS**, and integrated with **OpenAI GPT-4o** and **Llama 3.2 90b Vision**.
 
-![megat-banner](./assets/logo2.png)
+![megat-banner](.src/assets/logo2.png)
 
 ---
 
@@ -34,7 +34,7 @@ Built with **Vite** using **React**, **Node.js**, **Tailwind CSS**, and integrat
 
 ## 🖼️ Screenshots
 
-![megat-banner](./assets/app-screenshot.png)
+![megat-banner](.src/assets/app-screenshot.png)
 
 ---
 
